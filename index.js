@@ -1,46 +1,66 @@
-// const open = require('open')
+require('dotenv').config()
+const fs = require('fs')
+const os = require('os')
+const cors = require('cors')
+const http = require('http')
+const https = require('https')
+const logger = require('morgan')
 const helmet = require('helmet')
+const cluster = require('cluster')
 const express = require('express')
 const bodyParser = require('body-parser')
+const compression = require('compression')
 const session = require('express-session')
 
 const config = require('./config')
-const { passport } = require('./src/utils')
+const routes = require('./routes')
+const app = express().set('port', config.app.port)
 
-const app = express()
-const port = config.app.port
-
-app.set('view engine', 'ejs')
-
+/** express server */
+app.use(cors())
+app.use(bodyParser.urlencoded({ limit: '30mb', extended: false }))
+app.use(bodyParser.json({ limit: '30mb', extended: false }))
 app.use(helmet())
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(bodyParser.json())
-app.use(express.static('public'))
-app.use(
-  session({
-    saveUninitialized: false,
-    resave: false,
-    secret: config.app.sessionSecret,
-    cookie: {
-      expires: new Date(Date.now() + 60 * 60 * 1000),
-    },
+app.use(compression())
+app.use(logger('dev'))
+app.use(session({ secret: 'blessedecoliving', resave: false, saveUninitialized: true, cookie: { maxAge: 60000 } }))
+
+/** router */
+routes(app)
+
+/** cluster server */
+const server =
+  config.app.modeServer === 'http'
+    ? http.createServer(app)
+    : https.createServer(
+        {
+          key: fs.readFileSync(config.app.openSslKeyPath),
+          cert: fs.readFileSync(config.app.openSslCertPath),
+        },
+        app
+      )
+if (cluster.isMaster && config.app.modeCluster) {
+  const cpus = os.cpus().length
+  for (let i = 0; i < cpus; i++) {
+    cluster.fork()
+  }
+  console.log(`Mode Cluster. Forking for ${cpus} CPUs`)
+} else {
+  const port = config.app.port
+  server.listen(port, () => {
+    console.log(`Start Express Server on Port ${port} Handled by Process ${process.pid}`)
+    return
   })
-)
 
-app.use(passport.initialize())
-app.use(passport.session())
-
-app.use((req, res, next) => {
-  res.locals.user = req.user || null
-  next()
-})
-
-require('./src/routes')(app)
-app.get('*', (req, res) => {
-  res.render('error404')
-})
-
-app.listen(port, async () => {
-  console.log(`Identity hub on port ${port}`)
-  // await open(`http://localhost:${port}`, { wait: true })
-})
+  process.on('SIGINT', () => {
+    server.close(err => {
+      if (err) {
+        console.error(`Error Express Server : ${err}`)
+        process.exit(1)
+        return
+      }
+      console.log(`Close Express Server on Port ${port} Handled by Process ${process.pid}`)
+      process.exit(0)
+    })
+  })
+}

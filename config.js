@@ -1,16 +1,18 @@
 module.exports = {
   app: {
-    port: 3000,
-    storeName: 'pfalfa',
-    sessionSecret: process.env.SESSION_SECRET || 'some-secret',
+    port: 3003,
+    host: 'localhost',
+    mainRoute: '/api',
+    modeServer: 'http',
+    modeCluster: false,
+    openSslKeyPath: process.env.SSL_KEYPATH || null,
+    openSslCertPath: process.env.SSL_CERTPATH || null,
+    loggerFilePath: './logs/access.log',
+    rateLimitSuspendTime: 5,
+    rateLimitMaxHitPerIP: 500,
+    pageLimit: 10,
   },
   db: {
-    peers: ['http://localhost:8765/gun', 'http://ec2-18-136-211-116.ap-southeast-1.compute.amazonaws.com:8765/gun'],
-  },
-  email: {
-    host: process.env.EMAIL_HOST || null,
-    username: process.env.EMAIL_USER || null,
-    password: process.env.EMAIL_PASSWORD || null,
-    port: 364,
+    peers: ['http://localhost:8765/gun'],
   },
 }
