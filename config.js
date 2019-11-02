@@ -4,7 +4,7 @@ module.exports = {
     host: 'localhost',
     mainRoute: '/api',
     modeServer: 'http',
-    modeCluster: false,
+    modeCluster: true,
     openSslKeyPath: process.env.SSL_KEYPATH || null,
     openSslCertPath: process.env.SSL_CERTPATH || null,
     loggerFilePath: './logs/access.log',
@@ -13,6 +13,6 @@ module.exports = {
     pageLimit: 10,
   },
   db: {
-    peers: ['http://localhost:8765/gun'],
+    peers: ['http://localhost:8778/gun'],
   },
 }
