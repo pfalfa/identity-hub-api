@@ -13,6 +13,6 @@ module.exports = {
     pageLimit: 10,
   },
   db: {
-    peers: ['http://localhost:8778/gun'],
+    peers: process.env.DB_PEERS,
   },
 }
