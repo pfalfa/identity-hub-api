@@ -23,7 +23,7 @@ app.use(bodyParser.json({ limit: '30mb', extended: false }))
 app.use(helmet())
 app.use(compression())
 app.use(logger('dev'))
-app.use(session({ secret: 'blessedecoliving', resave: false, saveUninitialized: true, cookie: { maxAge: 60000 } }))
+app.use(session({ secret: config.app.sessionSecret, resave: false, saveUninitialized: true, cookie: { maxAge: 60000 } }))
 
 /** router */
 routes(app)
