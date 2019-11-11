@@ -1,8 +1,6 @@
-const Gun = require('gun')
 const router = require('express').Router()
 
-const config = require('../config')
-const gun = Gun({ file: 'db', peers: [config.db.peers] })
+const { gun } = require('../utils')
 
 router.get('/', (req, res) => {
   const { authorization } = req.headers
@@ -35,6 +33,7 @@ const getUserByPubKey = (pubkey, callback) => {
 
       delete data._
       delete data.auth
+      delete data.profile
       return callback(null, { status: 200, success: true, message: null, data })
     })
   } catch (error) {
