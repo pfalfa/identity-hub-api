@@ -5,7 +5,7 @@ require('gun/sea')
 require('gun/lib/path')
 require('gun/lib/server')
 
-const gun = Gun({ file: 'db', peers: [config.db.peers] })
+const gun = Gun({ file: 'db', peers: config.db.peers })
 const sea = Gun.SEA
 const textRandom = val => {
   return Gun.text.random(val)
