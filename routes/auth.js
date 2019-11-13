@@ -8,6 +8,7 @@ router.post('/register', (req, res) => {
   const { email, passphare, hint } = req.body
   if (!email || !passphare) return res.status(400).json({ success: false, message: 'Invalid payload', data: null })
 
+  user.leave()
   user.create(email, passphare, ack => {
     if (ack && ack.err) return res.status(400).json({ success: false, message: ack.err, data: null })
 
@@ -53,6 +54,7 @@ router.post('/forgot', (req, res) => {
   const { email, hint } = req.body
   if (!email || !hint) return res.status(400).json({ success: false, message: 'Invalid payload', data: null })
 
+  user.leave()
   gun.get(`user/${email}`).once(data => {
     if (!data) return res.status(400).json({ success: false, message: 'User not found', data: null })
     if (util.decrypt(data.hint) !== hint) return res.status(400).json({ success: false, message: 'Recovery hint not correct', data: null })
@@ -71,10 +73,11 @@ router.post('/forgot', (req, res) => {
 router.post('/reset', (req, res) => {
   const { email, oldPassphare, newPassphare } = req.body
   if (!email || !oldPassphare || !newPassphare) return res.status(400).json({ success: false, message: 'Invalid payload', data: null })
-  // console.log('==oldPassphare', oldPassphare)
+  console.log('==oldPassphare', oldPassphare)
 
+  user.leave()
   gun.get(`user/${email}`).once(data => {
-    // console.log('==first data', data)
+    console.log('==first data', data)
 
     if (!data) return res.status(400).json({ success: false, message: 'User not found', data: null })
     if (data.temp.toString().trim() !== oldPassphare.toString().trim())
@@ -82,7 +85,7 @@ router.post('/reset', (req, res) => {
 
     delete data._
     const pwd = util.decrypt(data.pwd)
-    // console.log('==pwd', pwd)
+    console.log('==pwd', pwd)
 
     user.auth(
       email,
@@ -107,6 +110,7 @@ router.post('/change-password', (req, res) => {
   const { email, oldPassphare, newPassphare } = req.body
   if (!email || !oldPassphare || !newPassphare) return res.status(400).json({ success: false, message: 'Invalid payload', data: null })
 
+  user.leave()
   user.auth(
     email,
     oldPassphare,
