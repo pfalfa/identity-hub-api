@@ -89,13 +89,13 @@ router.post('/reset', (req, res) => {
 
     user.auth(
       email,
-      pwd,
+      pwd.toString().trim(),
       ack => {
         if (ack && ack.err) return res.status(400).json({ success: false, message: ack.err, data: null })
 
         delete data.temp
         data.pwd = util.encrypt(newPassphare)
-        // console.log('==last data', data)
+        console.log('==last data', data)
         gun.get(`user/${email}`).put(data, ack => {
           if (ack && ack.err) return res.status(400).json({ success: false, message: ack.err, data: null })
           return res.status(200).json({ success: true, message: 'Reset password successfully', data: null })
