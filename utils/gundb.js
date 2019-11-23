@@ -1,7 +1,7 @@
 const Gun = require('gun')
 const config = require('../config')
 require('gun/sea')
-// require('gun/lib/webrtc')
+require('gun/lib/webrtc')
 require('gun/lib/path')
 require('gun/lib/server')
 
