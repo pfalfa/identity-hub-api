@@ -1,6 +1,7 @@
 require('dotenv').config()
 const fs = require('fs')
 const os = require('os')
+const path = require('path')
 const cors = require('cors')
 const http = require('http')
 const https = require('https')
@@ -11,6 +12,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const compression = require('compression')
 const session = require('express-session')
+const swaggerJSDoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
 
 const config = require('./config')
 const routes = require('./routes')
@@ -25,12 +28,32 @@ app.use(compression())
 app.use(logger('dev'))
 app.use(session({ secret: config.app.sessionSecret, resave: false, saveUninitialized: true, cookie: { maxAge: 60000 } }))
 
-/** router */
-routes(app)
+/** api docs */
+const swaggerConfig = swaggerJSDoc(config.swagger)
+const swaggerOptions = {
+  customSiteTitle: 'Identity Hub API',
+  customCss: '.topbar { display: none }',
+}
+const swaggerUiSetup = swaggerUi.setup(swaggerConfig, swaggerOptions)
 
-/** cluster server */
+app.get(config.app.route + '/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json')
+  res.send(swaggerConfig)
+})
+app.get(
+  config.app.route,
+  (req, res) => {
+    res.sendfile(path.join(__dirname, './html/apidoc.html'))
+  },
+  swaggerUiSetup
+)
+
+/** router */
+routes(app, swaggerUi, swaggerUiSetup)
+
+/** clustering server */
 const server =
-  config.app.modeServer === 'http'
+  !config.app.openSslKeyPath && !config.app.openSslCertPath
     ? http.createServer(app)
     : https.createServer(
         {
@@ -39,7 +62,7 @@ const server =
         },
         app
       )
-if (cluster.isMaster && config.app.modeCluster) {
+if (cluster.isMaster) {
   const cpus = os.cpus().length
   for (let i = 0; i < cpus; i++) {
     cluster.fork()
@@ -64,3 +87,5 @@ if (cluster.isMaster && config.app.modeCluster) {
     })
   })
 }
+
+module.exports = app

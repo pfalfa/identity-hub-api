@@ -30,15 +30,15 @@ $ docker run --name pfalfa-ihub-api -d -p 3003:3003 pfalfa-ihub-api
 
 ## API Doc
 
-Host API : http://localhost:3003
+Host API : http://localhost:3003/api
 
-- Using params
-  - Required: parameter pubkey
+| Description             | Endpoint                      | Method  | Status  | Response                                                                                |
+| ----------------------- | ----------------------------- | ------- | ------- | --------------------------------------------------------------------------------------- |
+| Get User By Public Key  | /users/:pubkey                | GET     | 200     | ```{success: true, message: null, data: {alias: "xxx", epub: "xxx", pub: "xxx"}}```     |
+|                         |                               |         | 403     | ```{success: false, message: "Example wrong message", data: null}```                    |
+|                         | /users                        | GET     | 200     | ```{success: true, message: null, data: {alias: "xxx", epub: "xxx", pub: "xxx"}}```     |
+|                         | Header Authorization: pubkey  |         | 403     | ```{success: false, message: "Example wrong message", data: null}```                    |
 
-| Endpoint            | Method | Response                                                                   |
-| ------------------- | ------ | -------------------------------------------------------------------------- |
-| /api/users/<pubkey> | GET    | status 200: {success: true, message: null, data: {alias, epub, pub}}       |
-|                     |        | status 400: {success: false, message: "Example wrong message", data: null} |
 
 - Using headers
   - Required: Authorization pubkey

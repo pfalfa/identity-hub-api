@@ -6,7 +6,8 @@ const limiter = rateLimit({
   max: config.app.rateLimitMaxHitPerIP,
 })
 
-module.exports = app => {
-  app.use(`${config.app.mainRoute}/auth`, limiter, require('./auth'))
-  app.use(`${config.app.mainRoute}/users`, limiter, require('./users'))
+module.exports = (app, swaggerUi, swaggerUiSetup) => {
+  app.use(`${config.app.route}/demo`, limiter, swaggerUi.serve, swaggerUiSetup)
+  app.use(`${config.app.route}/auth`, limiter, require('./auth'))
+  app.use(`${config.app.route}/users`, limiter, require('./users'))
 }
