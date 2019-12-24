@@ -1,8 +1,7 @@
 const router = require('express').Router()
 
 const { gun, util } = require('../utils')
-const user = gun.user()
-// user.recall({ sessionStorage: false })
+const user = gun.user().recall({ sessionStorage: false })
 
 router.post('/register', (req, res) => {
   const { email, passphare, hint } = req.body
@@ -36,10 +35,10 @@ router.post('/register', (req, res) => {
 
 router.post('/login', (req, res) => {
   const { email, passphare } = req.body
-  const sPassphare = passphare.toString().trim()
-  if (!email || !sPassphare) return res.status(400).json({ success: false, message: 'Invalid payload', data: null })
+  if (!email || !passphare) return res.status(400).json({ success: false, message: 'Invalid payload', data: null })
 
-  user.auth(email, sPassphare, ack => {
+  user.leave()
+  user.auth(email, passphare, ack => {
     if (ack && ack.err) return res.status(400).json({ success: false, message: ack.err, data: null })
 
     const data = ack.sea
@@ -61,7 +60,6 @@ router.post('/forgot', (req, res) => {
 
     delete data._
     data.temp = util.randomPassword()
-    // console.log('==forgot data', data)
 
     gun.get(`user/${email}`).put(data, ack => {
       if (ack && ack.err) return res.status(400).json({ success: false, message: ack.err, data: null })
@@ -73,18 +71,14 @@ router.post('/forgot', (req, res) => {
 router.post('/reset', (req, res) => {
   const { email, oldPassphare, newPassphare } = req.body
   if (!email || !oldPassphare || !newPassphare) return res.status(400).json({ success: false, message: 'Invalid payload', data: null })
-  // console.log('==oldPassphare', oldPassphare)
 
   gun.get(`user/${email}`).once(data => {
-    // console.log('==first data', data)
-
     if (!data) return res.status(400).json({ success: false, message: 'User not found', data: null })
     if (data.temp.toString().trim() !== oldPassphare.toString().trim())
       return res.status(400).json({ success: false, message: 'Temp password not correct', data: null })
 
     delete data._
     const pwd = util.decrypt(data.pwd)
-    // console.log('==pwd', pwd)
 
     user.auth(
       email,
@@ -94,7 +88,6 @@ router.post('/reset', (req, res) => {
 
         delete data.temp
         data.pwd = util.encrypt(newPassphare)
-        // console.log('==last data', data)
         gun.get(`user/${email}`).put(data, ack => {
           if (ack && ack.err) return res.status(400).json({ success: false, message: ack.err, data: null })
           return res.status(200).json({ success: true, message: 'Reset password successfully', data: null })
@@ -134,6 +127,7 @@ router.delete('/unregister', (req, res) => {
 
     console.log('==ack', ack)
     return res.status(500).json({ success: false, message: 'Stil on develop', data: null })
+    /**  */
     // user.delete(email, passphare, ack => {
     //   if (ack && ack.err) return res.status(400).json({ success: false, message: ack.err, data: null })
     //   return res.status(201).json({ success: true, message: 'User deleted successfully', data: null })
