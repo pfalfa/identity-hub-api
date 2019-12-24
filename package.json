@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "main": "index.js",
   "repository": "git@github.com:pfalfa/identity-hub-api.git",
-  "license": "Apache",
+  "license": "Apache2",
   "scripts": {
     "start": "nodemon index.js"
   },

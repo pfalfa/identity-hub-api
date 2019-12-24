@@ -89,15 +89,15 @@
  *          success:
  *            type: boolean
  *            example: false
- *  SendBadRequest:
+ *  ResponseBadRequest:
  *    properties:
- *      meta:
- *        type: object
- *        properties:
- *          message:
- *            type: string
- *            example: Data cannot be created/updated/deleted
- *          success:
- *            type: boolean
- *            example: false
+ *      success:
+ *        type: boolean
+ *        example: false
+ *      message:
+ *        type: string
+ *        example: User already created!
+ *      data:
+ *        type: string
+ *        example: null
  */

@@ -1,34 +1,33 @@
 /**
  * @swagger
  * tags:
- *  - name: Payment
- *    description: Rest API of user payment.
+ *  - name: Authorization
+ *    description: Rest API of user authorization (login, register).
  * paths:
- *  /api/v1/payment/bank-transfer:
+ *  /api/auth/register:
  *    post:
  *      tags:
- *        - Payment
- *      summary: Charge VA
- *      description: VA BCA & BNI.
+ *        - Authorization
+ *      summary: Register new user
  *      requestBody:
  *        required: true
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/definitions/PayloadCharge'
+ *              $ref: '#/definitions/PayloadRegister'
  *      responses:
  *        200:
- *          description: Charge Success.
+ *          description: Response Success.
  *          content:
  *            application/json:
  *              schema:
- *                $ref: '#/definitions/SuccessRequestCharge'
+ *                $ref: '#/definitions/ResponseSuccessRegister'
  *        400:
- *          description: Bad request. Charge Error
+ *          description: Response Bad request.
  *          content:
  *            application/json:
  *              schema:
- *                $ref: '#/definitions/BadRequest'
+ *                $ref: '#/definitions/ResponseBadRequest'
  *  /api/v1/payment/detail:
  *    post:
  *      tags:
@@ -73,7 +72,53 @@
  *            application/json:
  *              schema:
  *                $ref: '#/definitions/BadRequest'
+ * 
  * definitions:
+ *  PayloadRegister:
+ *    properties:
+ *      email:
+ *        type: string
+ *        example: user@email.com
+ *      passphare:
+ *        type: string
+ *        example: P@ssw0rd
+ *      hint:
+ *        type: string
+ *        example: Sebuah Kata Hint
+ *  ResponseSuccessRegister:
+ *    properties:
+ *      success:
+ *        type: boolean
+ *        example: true
+ *      message:
+ *        type: string
+ *        example: User created successfully
+ *      data:
+ *        type: object
+ *        properties:
+ *          pub:
+ *            type: string
+ *            example: 3dSC18IJNY2BiAKjoST5GUukiLmfAm8LYNgHkANQKXQ.81IFAqp3pJTlBKdPg1kbSqoqIXnbrk7C7vGjN3ozY_A
+ *          epub:
+ *            type: string
+ *            example: w3O9QMv3CRHPXH_znH2s1YpUjNLoC3cS25ilaqX8CJM.EJR4LBQUxqpq3D9SPPkSzkVEk3wZIfQd0PEoFLDGONE
+ *          priv:
+ *            type: string
+ *            example: KL6fov_S4Tz2BG4p5FgPjUwIaKG_6rVZVFuHOUivuww
+ *          epriv:
+ *            type: string
+ *            example: g0foq9F44FtvHHwopa1W-Mn80umJzgFB1uugzw9ZZDs
+ *          profile:
+ *            type: object
+ *            properties:
+ *              email:
+ *                type: string
+ *                format: email
+ *                example: user@email.com
+ *              hint:
+ *                type: string
+ *                example: Sebuah Kata Hint
+ * 
  *  PayloadDetailPayment:
  *   properties:
  *      transaction_id:
@@ -130,7 +175,7 @@
  *                  name:
  *                      type: string
  *                      example: Ayam XOXOXO
- *  SuccessGetDetailPayment: 
+ *  SuccessGetDetailPayment:
  *    properties:
  *      code:
  *        type: number
@@ -336,6 +381,5 @@
  *      data:
  *        type: object
  *        example: {}
- * 
+ *
  */
-
