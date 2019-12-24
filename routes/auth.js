@@ -5,25 +5,23 @@ const user = gun.user().recall({ sessionStorage: false })
 
 router.post('/register', (req, res) => {
   const { email, passphare, hint } = req.body
-  const sPassphare = passphare.toString().trim()
-  if (!email || !sPassphare) return res.status(400).json({ success: false, message: 'Invalid payload', data: null })
+  if (!email || !passphare) return res.status(400).json({ success: false, message: 'Invalid payload', data: null })
 
-  user.create(email, sPassphare, ack => {
+  user.create(email, passphare, ack => {
     if (ack && ack.err) return res.status(400).json({ success: false, message: ack.err, data: null })
 
     /** login */
-    user.auth(email, sPassphare, ack => {
+    user.auth(email, passphare, ack => {
       if (ack && ack.err) return res.status(400).json({ success: false, message: ack.err, data: null })
 
       /** create profile */
       const data = ack.sea
-      const profile = { email, hint }
-      data.profile = profile
-      user.get('profile').put(profile, ack => {
+      data.profile = { email, hint }
+      user.get('profile').put(data.profile, ack => {
         if (ack && ack.err) return res.status(400).json({ success: false, message: ack.err, data: null })
 
         /** create user */
-        const userProfile = { email, hint: util.encrypt(hint), pwd: util.encrypt(sPassphare) }
+        const userProfile = { email, hint: util.encrypt(hint), pwd: util.encrypt(passphare) }
         gun.get(`user/${email}`).put(userProfile, ack => {
           if (ack && ack.err) return res.status(400).json({ success: false, message: ack.err, data: null })
           return res.status(201).json({ success: true, message: 'User created successfully', data })
